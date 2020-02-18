@@ -41,7 +41,7 @@ Postup: Moteino Mega R4
 
 2. Stáhni knihovnu lmic, otevři vzorový sketch, vlož klíče pro komunikaci s NS a namapuj piny pro Moteino Mega R4
    
-   ```
+   ```c
    // Pin mapping
    const lmic_pinmap lmic_pins = {
      .nss = 4,
@@ -53,7 +53,7 @@ Postup: Moteino Mega R4
    
 3. Převeď užitečné zatížení GPS informací na pole bytů
    
-   ```
+   ```c
    uint8_t txBuffer[9];
 
    uint32_t latitude = ([Tady bude metoda, která naplní latitude skutečnou hodnotou]) * 10000;
@@ -79,7 +79,7 @@ Postup: Moteino Mega R4
    
 4. V konzoli TTN vlož do "Payload Formats" vlastní dekodér
    
-   ```
+   ```js
    function Decoder(bytes, port) {
      // Decode an uplink message from a buffer
      // (array) of bytes to an object of fields.
