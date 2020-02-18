@@ -8,7 +8,7 @@ Postup: Moteino Mega R4
 
 1. Propoj GPS modul s vývojovou deskou
 
-table style="width: 100%;">
+<table style="width: 100%;">
 <tbody>
    <tr>
    <td style="font-size: 15px; padding: 10px;"><b>NEO modul</b></td>
@@ -38,45 +38,64 @@ table style="width: 100%;">
 </tbody>
 </table>
 
+
 2. Stáhni knihovnu lmic, otevři vzorový sketch, vlož klíče pro komunikaci s NS a namapuj piny pro Moteino Mega R4
-
-// Pin mapping
-const lmic_pinmap lmic_pins = {
-  .nss = 4,
-  .rxtx = LMIC_UNUSED_PIN,
-  .rst = 13,
-  .dio = {2, 1, 0},
-};
-
+   ```
+   // Pin mapping
+   const lmic_pinmap lmic_pins = {
+     .nss = 4,
+     .rxtx = LMIC_UNUSED_PIN,
+     .rst = 13,
+     .dio = {2, 1, 0},
+   };
+   ```
 3. Převeď užitečné zatížení GPS informací na pole bytů
+   ```
+   uint8_t txBuffer[9];
 
+   uint32_t latitude = ([Tady bude metoda, která naplní latitude skutečnou hodnotou]) * 10000;
+   uint32_t longitude = ([Tady bude metoda, která naplní longitude skutečnou hodnotou])* 10000;
+   uint16_t altitude = ([Tady bude metoda, která naplní altitude skutečnou hodnotou]) * 10;
+   uint8_t hdop = ([Tady bude metoda, která naplní hdop skutečnou hodnotou]) * 10;     
+
+   txBuffer[0] = latitude >> 16;
+   txBuffer[1] = latitude >> 8;
+   txBuffer[2] = latitude;
+
+   txBuffer[3] = longitude >> 16;
+   txBuffer[4] = longitude >> 8;
+   txBuffer[5] = longitude;
+
+   txBuffer[6] = altitude >> 8;
+   txBuffer[7] = altitude;
+
+   txBuffer[8] = hdop;
+
+   LMIC_setTxData2(1,txBuffer, sizeof(txBuffer), 0);  
+   ```
+4. V konzoli TTN vlož do "Payload Formats" vlastní dekodér
 ```
-uint8_t txBuffer[9];
+function Decoder(bytes, port) {
+  // Decode an uplink message from a buffer
+  // (array) of bytes to an object of fields.
+  var decoded = {};
 
-uint32_t latitude = ([Tady bude metoda, která naplní latitude skutečnou hodnotou]) * 10000;
-uint32_t longitude = ([Tady bude metoda, která naplní longitude skutečnou hodnotou])* 10000;
-uint16_t altitude = ([Tady bude metoda, která naplní altitude skutečnou hodnotou]) * 10;
-uint8_t hdop = ([Tady bude metoda, která naplní hdop skutečnou hodnotou]) * 10;     
+  decoded.lat = (bytes[0]<<16) + (bytes[1]<<8)+ bytes[2];
+  decoded.lat = decoded.lat / 10000.0 ;
   
-txBuffer[0] = latitude >> 16;
-txBuffer[1] = latitude >> 8;
-txBuffer[2] = latitude;
+  decoded.lon = (bytes[3]<<16) + (bytes[4]<<8) + bytes[5];
+  decoded.lon = decoded.lon / 10000.0;
+  
+  decoded.alt = (bytes[6]<<8) + bytes[7];
+  decoded.alt = decoded.alt / 10.0;
+  
+  decoded.hdop = bytes[8] / 10.0;
 
-txBuffer[3] = longitude >> 16;
-txBuffer[4] = longitude >> 8;
-txBuffer[5] = longitude;
-
-txBuffer[6] = altitude >> 8;
-txBuffer[7] = altitude;
-
-txBuffer[8] = hdop;
-        
-LMIC_setTxData2(1,txBuffer, sizeof(txBuffer), 0);  
+  return decoded;
+}
 ```
-
-
-
-
+5. V konzoli TTN nastav v "Integrations" integraci s TTN Mapperem
+6. Sleduj výsledky https://ttnmapper.org/advanced-maps/
 
 
 
