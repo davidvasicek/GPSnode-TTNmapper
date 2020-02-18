@@ -8,38 +8,39 @@ Postup: Moteino Mega R4
 
 1. Propoj GPS modul s vývojovou deskou
 
-<table style="width: 100%;">
-<tbody>
-   <tr>
-   <td style="font-size: 15px; padding: 10px;"><b>NEO modul</b></td>
-   <td style="font-size: 15px; padding: 10px;"><b>-></b></td>
-   <td style="font-size: 15px; padding: 10px;"><b>Arduino UNO</b></td>
-   </tr>
-   <tr>
-      <td>VCC</td>
-      <td>-></td>
-      <td>3V3 / 5V</td>
-   </tr>
-   <tr>
-      <td>GND</td>
-      <td>-></td>
-      <td>GND</td>
-   </tr>
-   <tr>
-      <td>RX</td>
-      <td>-></td>
-      <td>3</td>
-   </tr>
-   <tr>
-      <td>TX</td>
-      <td>-></td>
-      <td>2</td>
-   </tr>
-</tbody>
-</table>
+   <table style="width: 100%;">
+   <tbody>
+      <tr>
+      <td style="font-size: 15px; padding: 10px;"><b>NEO modul</b></td>
+      <td style="font-size: 15px; padding: 10px;"><b>-></b></td>
+      <td style="font-size: 15px; padding: 10px;"><b>Arduino UNO</b></td>
+      </tr>
+      <tr>
+         <td>VCC</td>
+         <td>-></td>
+         <td>3V3 / 5V</td>
+      </tr>
+      <tr>
+         <td>GND</td>
+         <td>-></td>
+         <td>GND</td>
+      </tr>
+      <tr>
+         <td>RX</td>
+         <td>-></td>
+         <td>3</td>
+      </tr>
+      <tr>
+         <td>TX</td>
+         <td>-></td>
+         <td>2</td>
+      </tr>
+   </tbody>
+   </table>
 
 
 2. Stáhni knihovnu lmic, otevři vzorový sketch, vlož klíče pro komunikaci s NS a namapuj piny pro Moteino Mega R4
+   
    ```
    // Pin mapping
    const lmic_pinmap lmic_pins = {
@@ -49,7 +50,9 @@ Postup: Moteino Mega R4
      .dio = {2, 1, 0},
    };
    ```
+   
 3. Převeď užitečné zatížení GPS informací na pole bytů
+   
    ```
    uint8_t txBuffer[9];
 
@@ -73,27 +76,30 @@ Postup: Moteino Mega R4
 
    LMIC_setTxData2(1,txBuffer, sizeof(txBuffer), 0);  
    ```
+   
 4. V konzoli TTN vlož do "Payload Formats" vlastní dekodér
-```
-function Decoder(bytes, port) {
-  // Decode an uplink message from a buffer
-  // (array) of bytes to an object of fields.
-  var decoded = {};
+   
+   ```
+   function Decoder(bytes, port) {
+     // Decode an uplink message from a buffer
+     // (array) of bytes to an object of fields.
+     var decoded = {};
 
-  decoded.lat = (bytes[0]<<16) + (bytes[1]<<8)+ bytes[2];
-  decoded.lat = decoded.lat / 10000.0 ;
-  
-  decoded.lon = (bytes[3]<<16) + (bytes[4]<<8) + bytes[5];
-  decoded.lon = decoded.lon / 10000.0;
-  
-  decoded.alt = (bytes[6]<<8) + bytes[7];
-  decoded.alt = decoded.alt / 10.0;
-  
-  decoded.hdop = bytes[8] / 10.0;
+     decoded.lat = (bytes[0]<<16) + (bytes[1]<<8)+ bytes[2];
+     decoded.lat = decoded.lat / 10000.0 ;
 
-  return decoded;
-}
-```
+     decoded.lon = (bytes[3]<<16) + (bytes[4]<<8) + bytes[5];
+     decoded.lon = decoded.lon / 10000.0;
+
+     decoded.alt = (bytes[6]<<8) + bytes[7];
+     decoded.alt = decoded.alt / 10.0;
+
+     decoded.hdop = bytes[8] / 10.0;
+
+     return decoded;
+   }
+   ```
+   
 5. V konzoli TTN nastav v "Integrations" integraci s TTN Mapperem
 6. Sleduj výsledky https://ttnmapper.org/advanced-maps/
 
