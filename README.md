@@ -54,6 +54,7 @@ Postup: Moteino Mega R4
 3. Převeď užitečné zatížení GPS informací na pole bytů
    
    ```c
+   // Užitečné zatížení ponese 9bytů. 3byte pro latitude, 3byte pro longitude, 2byte pro altitude, 1byte pro hdop
    uint8_t txBuffer[9];
 
    uint32_t latitude = ([Tady bude metoda, která naplní latitude skutečnou hodnotou]) * 10000;
